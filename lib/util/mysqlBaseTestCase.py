@@ -49,9 +49,10 @@ class mysqlBaseTestCase(unittest.TestCase):
             queries = ["DROP SCHEMA IF EXISTS test"
                       ,"CREATE SCHEMA IF NOT EXISTS test"
                       ]
-            for server in self.servers:
-                retcode, result = self.execute_queries(queries, server, schema='mysql')
-                self.assertEqual(retcode,0,result)
+            if self.servers:
+                for server in self.servers:
+                    retcode, result = self.execute_queries(queries, server, schema='mysql')
+                    self.assertEqual(retcode,0,result)
 
     # Begin our utility code here
     # This is where we add methods that enable a test to do magic : )
