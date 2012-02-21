@@ -26,9 +26,21 @@
 class matrixManager:
     def __init__(self, variables):
         if not variables['optmatrix']:
-            return None
-        matrix_list=[]
-        for i in variables['optmatrix'].split(','):
-            option_tuple = i.split('=')[0], i.split('=')[1]
-            matrix_list.append(option_tuple)
-        self.option_matrix = dict(matrix_list)
+            matrix_list=[]
+            for i in variables['optmatrix'].split(','):
+                option_tuple = i.split('=')[0], i.split('=')[1]
+                matrix_list.append(option_tuple)
+            self.option_matrix = dict(matrix_list)
+
+
+    def matrix_check_req(self, matrix_reqlist):
+        """Check requirements method assures that options required
+        for test were provided to --opt-matrix
+        
+        """
+        while matrix_reqlist != []:
+          req_shift = matrix_reqlist.pop()
+          if not self.option_matrix[req_shift]:
+            raise KeyError('The required option %s missing from opt-matrix' %(req_shift))
+
+
