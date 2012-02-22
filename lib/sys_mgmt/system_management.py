@@ -33,6 +33,7 @@
 # imports
 import os
 import sys
+import pwd
 import shutil
 import getpass
 import commands
@@ -526,6 +527,13 @@ class systemManager:
         except OSError:
             self.logging.verbose("PID: %s was not running despite the existence of a pid file.  This may be of note...")
         return
+
+    def user_exists(self, username):
+        try:
+          pwd.getpwnam(username)[0]
+        except KeyError:
+          return False
+        return True
    
     def get_ip_address(self):
         """ We find the ip address of our host.
