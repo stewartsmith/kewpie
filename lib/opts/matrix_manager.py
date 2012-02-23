@@ -25,7 +25,8 @@
 
 class matrixManager:
     def __init__(self, variables):
-        if not variables['optmatrix']:
+        self.option_matrix = {}
+        if variables['optmatrix']:
             matrix_list=[]
             for i in variables['optmatrix'].split(','):
                 option_tuple = i.split('=')[0], i.split('=')[1]
