@@ -245,9 +245,9 @@ class mysqlServer(Server):
                       , "--tmpdir=%s"  %(self.tmpdir)
                       , "--character-sets-dir=%s" %(self.charsetdir)
                       , self.langstring
-                      , "--ssl-ca=%s" %(os.path.join(self.std_data,'cacert.pem'))
-                      , "--ssl-cert=%s" %(os.path.join(self.std_data,'server-cert.pem'))
-                      , "--ssl-key=%s" %(os.path.join(self.std_data,'server-key.pem'))
+                      , "--loose-ssl-ca=%s" %(os.path.join(self.std_data,'cacert.pem'))
+                      , "--loose-ssl-cert=%s" %(os.path.join(self.std_data,'server-cert.pem'))
+                      , "--loose-ssl-key=%s" %(os.path.join(self.std_data,'server-key.pem'))
                       , "--port=%d" %(self.master_port)
                       , "--socket=%s" %(self.socket_file)
                       , "--pid-file=%s" %(self.pid_file)
