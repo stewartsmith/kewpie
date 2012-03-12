@@ -123,8 +123,11 @@ class basicTest(innodbCrashTestCase):
             for w in workers:
               w.join()
             time.sleep(2)
-            while randgen_process.poll():
-                randgen_process.send_signal(signal.SIGINT)
+            while randgen_process.poll() is None:
+                try:
+                    randgen_process.send_signal(signal.SIGINT)
+                except OSError, e:
+                    pass
 
             retcode = self.master_server.start()
             timeout = 300
