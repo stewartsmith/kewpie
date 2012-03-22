@@ -31,6 +31,7 @@ class xtrabackupManager:
         self.logging = system_manager.logging
         self.xb_bin_path = variables['xtrabackuppath']
         self.ib_bin_path = variables['innobackupexpath']
+        self.workdir = variables['workdir']
 
     def backup_full(self,utility,server_object):
         self.datadir  = server_object.datadir
