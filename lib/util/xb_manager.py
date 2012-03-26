@@ -33,40 +33,29 @@ class xtrabackupManager:
         self.xb_bin_path = variables['xtrabackuppath']
         self.ib_bin_path = variables['innobackupexpath']
         self.backup_dir = os.path.join(variables['workdir'],'backups')
+        if not os.path.isdir(self.backup_dir):
+            os.makedirs(self.backup_dir)
+
+    def alloc_dir(self, topdir, dir_pattern="backup"):
+        dir_pattern_obj = dir_pattern + "(\\d+)"
+        dir_pattern_obj = re.compile(dir_pattern_obj)
+        dir_list = [list(dirs)[1] for dirs in os.walk(topdir) if list(dirs)[0] == topdir][0]
+        dir_list = [b for b in dir_list if dir_pattern_obj.match(b)]
+        if not dir_list:
+            dir_suffix = '0'
+        else:
+            dir_suffix = str(max([int(re.split(dir_pattern,b)[1]) for b in dir_list])+1)
+
+        return dir_pattern+dir_suffix
 
     def backup_full(self,server_object):
-        self.datadir  = server_object.datadir
+        self.datadir = server_object.datadir
         self.ib_bin = self.xb_bin_path
         self.xb_bin = self.ib_bin_path
         self.b_root_dir = self.backup_dir
-        self.b_path = os.path.join(self.b_root_dir, alloc_dir(self.b_root_dir))
+        self.b_path = os.path.join(self.b_root_dir, self.alloc_dir(self.b_root_dir))
+        os.makedirs(self.b_path)
         return self
-
-    def alloc_dir(topdir, dir_pattern="backup"):
-        dir_pattern_obj = dir_pattern + "(\\d+)"
-        dir_pattern_obj = re.compile(dir_pattern_obj)
-        for dirs in list(os.walk(topdir)):
-            if list(dirs)[0] == topdir:
-                dir_list = list(dirs)[1]
-        
-        for b in dir_list[:]:
-            res = dir_pattern_obj.match(b)
-            if not res:
-                dir_list.remove(b)
-
-        if dir_list == []:
-            return_result = dir_pattern + '0'
-            return return_result
-        else:
-            for a in dir_list[:]:
-                dir_list.extend(re.split(dir_pattern,a))
-                dir_list.remove(a)
-
-            dir_list = filter(None, dir_list)
-            dir_list.sort()
-            return_result = dir_pattern + str(int(dir_list[len(dir_list)-1])+1)
-            return return_result
-
 
 
 

@@ -49,5 +49,3 @@ class basicTest(mysqlBaseTestCase):
         print(backup1.ib_bin, backup1.xb_bin)
         print(backup1.b_root_dir, backup1.b_path)
 
- 
-
