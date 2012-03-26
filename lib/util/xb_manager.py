@@ -20,6 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
+import re
 import subprocess
 
 class xtrabackupManager:
@@ -31,11 +32,13 @@ class xtrabackupManager:
         self.logging = system_manager.logging
         self.xb_bin_path = variables['xtrabackuppath']
         self.ib_bin_path = variables['innobackupexpath']
-        self.workdir = variables['workdir']
+        self.backup_dir = os.path.join(variables['workdir'],'backups')
 
-    def backup_full(self,utility,server_object):
+    def backup_full(self,server_object):
         self.datadir  = server_object.datadir
-        self.approach = utility
+        self.ib_bin = self.xb_bin_path
+        self.xb_bin = self.ib_bin_path
+        self.bdir = self.backup_dir
         return self
 
 
