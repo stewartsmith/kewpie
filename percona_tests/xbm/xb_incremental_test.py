@@ -43,6 +43,11 @@ class basicTest(mysqlBaseTestCase):
         backup0 = xb_manager.backup_full(master_server)
         print(backup0.datadir)
         print(backup0.ib_bin, backup0.xb_bin)
-        print(backup0.bdir)
+        print(backup0.b_root_dir, backup0.b_path)
+        backup1 = xb_manager.backup_full(master_server)
+        print(backup1.datadir)
+        print(backup1.ib_bin, backup1.xb_bin)
+        print(backup1.b_root_dir, backup1.b_path)
+
  
 

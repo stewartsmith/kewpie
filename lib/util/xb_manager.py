@@ -38,7 +38,8 @@ class xtrabackupManager:
         self.datadir  = server_object.datadir
         self.ib_bin = self.xb_bin_path
         self.xb_bin = self.ib_bin_path
-        self.bdir = self.backup_dir
+        self.b_root_dir = self.backup_dir
+        self.b_path = os.path.join(self.b_root_dir, alloc_dir(self.b_root_dir))
         return self
 
     def alloc_dir(topdir, dir_pattern="backup"):
