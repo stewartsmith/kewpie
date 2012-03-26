@@ -58,7 +58,7 @@ class testExecutor():
         self.server_manager = self.execution_manager.server_manager
         self.time_manager = self.system_manager.time_manager
         self.matrix_manager = self.execution_manager.matrix_manager
-        self.matrix_manager = self.execution_manager.xtrabackup_manager
+        self.xtrabackup_manager = self.execution_manager.xtrabackup_manager
         self.name = name
         self.working_environment = {} # we pass env dict to define what we need
         self.dirset = { self.name : { 'log': None } }

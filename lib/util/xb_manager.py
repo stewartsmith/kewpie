@@ -20,6 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
+import re
 import subprocess
 
 class xtrabackupManager:
@@ -31,11 +32,42 @@ class xtrabackupManager:
         self.logging = system_manager.logging
         self.xb_bin_path = variables['xtrabackuppath']
         self.ib_bin_path = variables['innobackupexpath']
+        self.backup_dir = os.path.join(variables['workdir'],'backups')
 
-    def backup_full(self,utility,server_object):
+    def backup_full(self,server_object):
         self.datadir  = server_object.datadir
-        self.approach = utility
+        self.ib_bin = self.xb_bin_path
+        self.xb_bin = self.ib_bin_path
+        self.bdir = self.backup_dir
         return self
+
+    def alloc_dir(topdir, dir_pattern="backup"):
+        dir_pattern_obj = dir_pattern + "(\\d+)"
+        dir_pattern_obj = re.compile(dir_pattern_obj)
+        for dirs in list(os.walk(topdir)):
+            if list(dirs)[0] == topdir:
+                dir_list = list(dirs)[1]
+        
+        for b in dir_list[:]:
+            res = dir_pattern_obj.match(b)
+            if not res:
+                dir_list.remove(b)
+
+        if dir_list == []:
+            return_result = dir_pattern + '0'
+            return return_result
+        else:
+            for a in dir_list[:]:
+                dir_list.extend(re.split(dir_pattern,a))
+                dir_list.remove(a)
+
+            dir_list = filter(None, dir_list)
+            dir_list.sort()
+            return_result = dir_pattern + str(int(dir_list[len(dir_list)-1])+1)
+            return return_result
+
+
+
 
 
 def execute_cmd(cmd, exec_path, outfile_path):
