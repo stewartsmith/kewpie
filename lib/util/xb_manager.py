@@ -20,6 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
+import shutil
 import re
 import subprocess
 
@@ -48,32 +49,47 @@ class xtrabackupManager:
 
         return dir_pattern+dir_suffix
 
+    def execute_cmd(self, cmd, exec_path, outfile_path):
+        outfile = open(outfile_path,'w')
+        cmd_subproc = subprocess.Popen( cmd
+                                      , cwd = exec_path
+                                      , shell=True
+                                      , stdout = outfile 
+                                      , stderr = subprocess.STDOUT 
+                                      )
+        cmd_subproc.wait()
+        retcode = cmd_subproc.returncode 
+        outfile.close
+        in_file = open(outfile_path,'r')
+        output = ''.join(in_file.readlines())
+        return retcode,output
+
     def backup_full(self,server_object):
         self.datadir = server_object.datadir
-        self.ib_bin = self.xb_bin_path
-        self.xb_bin = self.ib_bin_path
+        self.ib_bin = self.ib_bin_path
+        self.xb_bin = self.xb_bin_path
         self.b_root_dir = self.backup_dir
-        self.b_path = os.path.join(self.b_root_dir, self.alloc_dir(self.b_root_dir))
-        os.makedirs(self.b_path)
+        allocated_dir = self.alloc_dir(self.b_root_dir)
+        self.b_path = os.path.join(self.b_root_dir, allocated_dir)
+        temp_log = os.path.join(self.b_root_dir, '%s.log' %allocated_dir)
+        self.xb_log = os.path.join(self.b_path, '%s.log' %allocated_dir)
+        cmd = [self.ib_bin
+              , "--defaults-file=%s" %server_object.cnf_file
+              , "--no-timestamp"
+              , "--user=root"
+              , "--port=%d" %server_object.master_port
+              , "--host=127.0.0.1"
+              , "--ibbackup=%s" %self.xb_bin
+              , self.b_path
+              ]
+        cmd = " ".join(cmd)
+        self.retcode, self.output = self.execute_cmd(cmd, self.b_root_dir, temp_log)
+        shutil.move(temp_log, self.xb_log)
         return self
 
 
 
 
-def execute_cmd(cmd, exec_path, outfile_path):
-    outfile = open(outfile_path,'w')
-    cmd_subproc = subprocess.Popen( cmd
-                                  , cwd = exec_path
-                                  , shell=True
-                                  , stdout = outfile 
-                                  , stderr = subprocess.STDOUT 
-                                  )
-    cmd_subproc.wait()
-    retcode = cmd_subproc.returncode 
-    outfile.close
-    in_file = open(outfile_path,'r')
-    output = ''.join(in_file.readlines())
-    return retcode,output
 
 
 def innobackupex_backup( innobackupex_path
