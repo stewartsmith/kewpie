@@ -44,6 +44,7 @@ from lib.server_mgmt.server_management import serverManager
 from lib.sys_mgmt.system_management import systemManager
 from lib.test_mgmt.execution_management import executionManager
 from lib.opts.matrix_manager import matrixManager
+from lib.util.xb_manager import xtrabackupManager
 
 # functions
 def handle_sys_config(input_args, defaults):
@@ -93,6 +94,8 @@ try:
         # Create our server_manager
         server_manager = serverManager(system_manager, variables)
 
+        # Create XtraBackup manager
+        xtrabackup_manager = xtrabackupManager(system_manager, server_manager, variables)
         # Get our mode-specific test_manager and test_executor
         (test_manager,test_executor) = handle_mode(variables, system_manager)
 
@@ -102,7 +105,7 @@ try:
         # Initialize test execution manager
         execution_manager = executionManager(server_manager, system_manager
                                         , test_manager, test_executor
-                                        , variables, matrix_manager)
+                                        , variables, matrix_manager, xtrabackup_manager)
 
         # Execute our tests!
         execution_manager.execute_tests()

@@ -39,11 +39,12 @@ class executionManager:
     """
 
     def __init__(self, server_manager, system_manager, test_manager
-                 , executor_type, variables, matrix_manager):
+                 , executor_type, variables, matrix_manager, xtrabackup_manager):
 
         self.server_manager = server_manager
         self.system_manager = system_manager
         self.matrix_manager = matrix_manager
+        self.xtrabackup_manager = xtrabackup_manager
         self.logging = system_manager.logging
         self.test_manager = test_manager
         if variables['verbose']:
