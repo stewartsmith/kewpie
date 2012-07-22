@@ -66,8 +66,8 @@ class xtrabackupManager:
 
         return '%s%s' %(dir_pattern,dir_suffix)
 
-  """ execute_cmd executes backup program to create backup object
-  """
+    """ execute_cmd executes backup program to create backup object
+    """
     def execute_cmd(self, cmd, exec_path, outfile_path):
         outfile = open(outfile_path,'w')
         cmd_subproc = subprocess.Popen( cmd
