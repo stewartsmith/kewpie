@@ -49,10 +49,9 @@ class mysqlBaseTestCase(unittest.TestCase):
             queries = ["DROP SCHEMA IF EXISTS test"
                       ,"CREATE SCHEMA IF NOT EXISTS test"
                       ]
-            if self.servers:
-                for server in self.servers:
-                    retcode, result = self.execute_queries(queries, server, schema='mysql')
-                    self.assertEqual(retcode,0,result)
+            for server in self.servers:
+                retcode, result = self.execute_queries(queries, server, schema='mysql')
+                self.assertEqual(retcode,0,result)
 
     # Begin our utility code here
     # This is where we add methods that enable a test to do magic : )
@@ -243,32 +242,17 @@ class mysqlBaseTestCase(unittest.TestCase):
                      , password=None
                      , schema='test'):
         try:
-            if server.client_init_command:
-                if password:
-                    conn = MySQLdb.connect( host = '127.0.0.1' 
-                                          , port = server.master_port
-                                          , user = 'root'
-                                          , passwd=password 
-                                          , db = schema
-                                          , init_command = server.client_init_command)
-                else:
-                    conn = MySQLdb.connect( host = '127.0.0.1'
-                                          , port = server.master_port
-                                          , user = 'root'
-                                          , db = schema
-                                          , init_command=server.client_init_command)
+            if password:
+                conn = MySQLdb.connect( host = '127.0.0.1' 
+                                  , port = server.master_port
+                                  , user = 'root'
+                                  , passwd=password 
+                                  , db = schema)
             else:
-                if password:
-                    conn = MySQLdb.connect( host = '127.0.0.1'
-                                          , port = server.master_port
-                                          , user = 'root'
-                                          , passwd=password
-                                          , db = schema)
-                else:
-                    conn = MySQLdb.connect( host = '127.0.0.1'
-                                          , port = server.master_port
-                                          , user = 'root'
-                                          , db = schema)
+                conn = MySQLdb.connect( host = '127.0.0.1'
+                                  , port = server.master_port
+                                  , user = 'root'
+                                  , db = schema)
 
             cursor = conn.cursor()
             cursor.execute(query)
@@ -289,17 +273,10 @@ class mysqlBaseTestCase(unittest.TestCase):
         results = {} 
         retcode = 0
         try:
-            if server.client_init_command:
-                conn = MySQLdb.connect( host = '127.0.0.1' 
-                                      , port = server.master_port
-                                      , user = 'root'
-                                      , db = schema
-                                      , init_command = server.client_init_command)
-            else:
-                conn = MySQLdb.connect( host = '127.0.0.1'
-                                      , port = server.master_port
-                                      , user = 'root'
-                                      , db = schema)
+            conn = MySQLdb.connect( host = '127.0.0.1' 
+                                  , port = server.master_port
+                                  , user = 'root'
+                                  , db = schema)
             cursor = conn.cursor()
             for idx, query in enumerate(query_list):
                 try:
@@ -349,20 +326,13 @@ class mysqlBaseTestCase(unittest.TestCase):
                 output = None
         return retcode, output
 
-    def get_randgen_process( self
-                           , cmd_sequence
-                           , test_executor
-                           , server
-                           , schema='test'
-                           , randgen_outfile=None
-                           , shell_flag = False):
+    def get_randgen_process(self, cmd_sequence, test_executor, server, schema='test'):
         """ There are times when we want finer grained control over our process
             and perhaps to kill it so it doesn't waste time running to completion
             for those cases, we have this function
 
         """
-        if not randgen_outfile:
-            randgen_outfile = os.path.join(test_executor.logdir,'randgen.out')
+        randgen_outfile = os.path.join(test_executor.logdir,'randgen.out')
         randgen_output = open(randgen_outfile,'w')
         server_type = test_executor.master_server.type
         if server_type in ['percona','galera']:
@@ -372,16 +342,14 @@ class mysqlBaseTestCase(unittest.TestCase):
                                                                                        , server.master_port
                                                                                        , schema)
         cmd_sequence.append(dsn)
-        # if we use shell=True, we need to supply a string vs. a seq.
-        if shell_flag:
-            cmd_sequence = " ".join(cmd_sequence)
+        cmd_sequence[0] = os.path.join(test_executor.system_manager.randgen_path,cmd_sequence[0])
         randgen_subproc = subprocess.Popen( cmd_sequence 
                                           , cwd=test_executor.system_manager.randgen_path
                                           , env=test_executor.working_environment
-                                          , shell=shell_flag
                                           , stdout = randgen_output
                                           , stderr = subprocess.STDOUT 
                                           )
+
         return randgen_subproc
 
     def find_backup_path(self, output):
@@ -407,7 +375,3 @@ class mysqlBaseTestCase(unittest.TestCase):
                 if slave_server.slave_ready():
                     slave_servers.pop(idx)  
             cycles -= 1
-            # short sleep to avoid polling slaves in busy loop
-            time.sleep(0.5)
-        if cycles == 0 and slave_servers:
-            raise Exception("Max cycles reached when waiting for slave servers to start")
